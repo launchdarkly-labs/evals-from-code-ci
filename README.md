@@ -77,3 +77,4 @@ The SDK records prompts and responses so judges can grade them. To turn capture 
 ## Credits
 
 The ToggleHealth policy documents in `data/policies` come from [marekdarkly/policy_agent](https://github.com/marekdarkly/policy_agent), MIT License, copyright (c) 2025 marekdarkly. See `data/policies/LICENSE`. This repo replaces that project's Bedrock knowledge base with a local keyword retriever, `app/retriever.py`.
+
