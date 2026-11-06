@@ -21,7 +21,7 @@ The demo app is a health insurance policy agent for a fictional insurer, ToggleH
 ## Setup
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # fill in the four values
 pytest -q              # offline, no API calls
@@ -37,6 +37,19 @@ python -m app.agent M-1001 "What's my specialist copay?"
 python -m evals.run_evals --dataset evals/datasets/pr.jsonl
 ```
 
+## Node.js
+
+`node/` is the same app and eval runner built on `@launchdarkly/ai-node` and `@launchdarkly/ai-openai-messages`. It reads the same `.env`, policy documents and datasets, and targets the same LaunchDarkly resources, so you can run either bootstrap script. It needs Node.js 22 or later.
+
+```bash
+cd node
+npm install
+npm test               # offline, no API calls
+npm run bootstrap
+npm run agent -- M-1001 "What's my specialist copay?"
+npm run evals -- --dataset ../evals/datasets/pr.jsonl
+```
+
 ## Datasets
 
 `evals/datasets/pr.jsonl` has 6 rows and runs on every pull request. `full.jsonl` has 20 rows and runs on a schedule. Both are sent as inline rows, so they're versioned with the code they test.
@@ -49,11 +62,13 @@ python -m evals.run_evals --dataset-key policy-agent-full --variation grounded
 
 ## CI
 
-`.github/workflows/evals-pr.yml` runs the offline tests, then the PR eval set. `evals-scheduled.yml` runs the full set on weekday mornings.
+`.github/workflows/evals-pr.yml` runs the offline tests, then the PR eval set. `evals-pr-node.yml` does the same for `node/`. `evals-scheduled.yml` runs the full set in both languages on weekday mornings.
 
 Add the secrets `LD_SDK_KEY`, `LD_API_TOKEN` and `OPENAI_API_KEY`, and the variable `LD_PROJECT_KEY`.
 
-The PR check starts as advisory: a failed eval shows on the pull request but doesn't block the merge. Once the suite is stable, set the repository variable `EVALS_BLOCKING` to `true` and make the `evals` job a required check.
+The PR check starts as advisory: a failed eval shows in the job summary but doesn't fail the job. Once the suite is stable, set the repository variable `EVALS_BLOCKING` to `true` and make `evals-gate`, or `evals-gate-node` for the Node.js version, a required check. The gate job reports on every pull request, including ones that change no app files and skip the evals, and fails when the offline tests or the evals fail.
+
+Pull requests from forks get no repository secrets, so they skip the evals. Run the evals yourself before you merge one.
 
 ## Prompt and response capture
 
