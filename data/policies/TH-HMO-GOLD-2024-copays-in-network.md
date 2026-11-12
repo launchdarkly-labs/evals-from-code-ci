@@ -4,7 +4,7 @@
 
 | Service Type | Copay Amount |
 |-------------|--------------|
-| **Primary Care Visit** | $25 |
+| **Primary Care Visit** | $45 |
 | **Specialist Visit** (with referral) | $45 |
 | **Urgent Care Visit** | $75 |
 | **Emergency Room Visit** | $350 |
